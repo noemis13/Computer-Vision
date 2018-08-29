@@ -1,0 +1,31 @@
+\providecommand{\abntreprintinfo}[1]{%
+ \citeonline{#1}}
+\setlength{\labelsep}{0pt}\begin{thebibliography}{}
+\providecommand{\abntrefinfo}[3]{}
+\providecommand{\abntbstabout}[1]{}
+\abntbstabout{v-1.9.2 }
+
+\bibitem[Birchfield 1998]{Stanley}
+\abntrefinfo{Birchfield}{BIRCHFIELD}{1998}
+{BIRCHFIELD, S. \emph{Essential and fundamental matrices}. 1998.
+  \url{http://robotics.stanford.edu/~birch/projective/node20.html}.
+Acessado em 28-05-2018.}
+
+\bibitem[Fusiello 1998]{reti}
+\abntrefinfo{Fusiello}{FUSIELLO}{1998}
+{FUSIELLO, A. \emph{Tutorial on Rectification of Stereo Images}. 1998.
+  \url{http://homepages.inf.ed.ac.uk/rbf/CVonline/LOCAL_COPIES/FUSIELLO/tutorial.html}.
+Acessado em 28-05-2018.}
+
+\bibitem[Hartley e Zisserman 2003]{hartley2003multiple}
+\abntrefinfo{Hartley e Zisserman}{HARTLEY; ZISSERMAN}{2003}
+{HARTLEY, R.; ZISSERMAN, A. \emph{Multiple view geometry in computer vision}.
+  [S.l.]: Cambridge university press, 2003.}
+
+\bibitem[Wikipedia 2018]{wiki}
+\abntrefinfo{Wikipedia}{WIKIPEDIA}{2018}
+{WIKIPEDIA. \emph{Image rectification}. 2018.
+  \url{https://en.wikipedia.org/wiki/Image_rectification}.
+Acessado em 28-05-2018.}
+
+\end{thebibliography}

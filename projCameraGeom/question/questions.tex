@@ -1,0 +1,137 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% VC36O Writeup Template
+%
+% This is a LaTeX document. LaTeX is a markup language for producing 
+% documents. Your task is to fill out this
+% document, then to compile this into a PDF document. 
+% You will then upload this PDF to `Moodle'.
+%
+% 
+% TO COMPILE:
+% > pdflatex thisfile.tex
+%
+% For references to appear correctly instead of as '??', you must run 
+% pdflatex twice.
+%
+% If you do not have LaTeX and need a LaTeX distribution:
+% - Personal laptops (all common OS): www.latex-project.org/get/
+%
+% If you need help with LaTeX, please come to office hours. 
+% Or, there is plenty of help online:
+% https://en.wikibooks.org/wiki/LaTeX
+%
+% Good luck!
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% How to include two graphics on the same line:
+% 
+% \includegraphics[width=0.49\linewidth]{yourgraphic1.png}
+% \includegraphics[width=0.49\linewidth]{yourgraphic2.png}
+%
+% How to include equations:
+%
+% \begin{equation}
+% y = mx+c
+% \end{equation}
+% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt]{article}
+
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[colorlinks = true,
+            linkcolor = blue,
+            urlcolor  = blue]{hyperref}
+\usepackage[a4paper,margin=1.5in]{geometry}
+\usepackage{stackengine,graphicx}
+\usepackage{fancyhdr}
+\setlength{\headheight}{15pt}
+\usepackage{microtype}
+\usepackage{times}
+
+% From https://ctan.org/pkg/matlab-prettifier
+\usepackage[numbered,framed]{matlab-prettifier}
+
+\frenchspacing
+\setlength{\parindent}{0cm} % Default is 15pt.
+\setlength{\parskip}{0.3cm plus1mm minus1mm}
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{Project 4 Questions}
+\rhead{VC36O 2018/1}
+\rfoot{\thepage}
+
+\date{}
+
+\title{\vspace{-1cm}Project 3 Questions}
+
+
+
+\begin{document}
+\maketitle
+\vspace{-3cm}
+\thispagestyle{fancy}
+
+%\section*{Instructions}
+%\begin{itemize}
+%  \item 3 questions.
+%  \item Write code where appropriate.
+%  \item Feel free to include images or equations.
+%  \item \textbf{Please use only the space provided and keep the page breaks.} Please do not make new pages, nor remove pages. The document is a template to help grading.
+%  \item If you really need extra space, please use new pages at the end of the document and refer us to it in your answers.
+%\end{itemize}
+
+\section*{Questions}
+
+\paragraph{Q1:} Describe the difference between the essential and fundamental matrices.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\paragraph{A1:} As matrizes Essencial e Fundamental descrevem a relação geométrica entre os pontos correspondentes de um par de câmeras estéreo. A única diferença entra as duas é que a primeira lida com câmeras calibradas, enquanto a segunda lida com câmeras não calibradas. A matriz Essencial contém cinco parâmetros (três para rotação e dois para a direção da tradução - a magnitude da tradução não pode ser recuperada devido à ambiguidade profundidade ou velocidade) e tem duas restrições: (1) seu determinante é zero e (2) seus dois valores singulares diferentes de zero são iguais. Já a matriz Fundamental contém sete parâmetros (dois para cada um dos epipolos e três para a homografia entre os dois feixes de linhas epipolares) e sua classificação é sempre dois \cite{Stanley}.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Please leave the pagebreak
+\pagebreak
+\paragraph{Q2:} What does it mean when your epipolar lines: a) cross at more than one point, b) radiate out of a point on the image plane, or c) converge to a point outside of the image plane?
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\paragraph{A2:} Your answer here.
+
+Quando as linhas epipolares cruzar em mais de um ponto, acontece intersecções do plano epipolar com planos de imagem \cite{hartley2003multiple}.
+
+Quando as linhas epipolares irradiam de um ponto no plano da imagem, o epipolo neste caso é denominado o foco de expansão e as mesmas linhas epipolares são sobrepostas em ambos os casos \cite{hartley2003multiple}.
+
+Quando as linhas epipolares convergem para um ponto fora do plano da imagem, os epipolos são infinitos e linhas epipolares são paralelas \cite{hartley2003multiple}.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Please leave the pagebreak
+\pagebreak
+\paragraph{Q3:} What is rectification, and why do we rectify image pairs?
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\paragraph{A3:} A retificação de imagem é um processo de transformação usado para projetar imagens em um plano de imagem comum. Esse processo possui vários graus de liberdade e há muitas estratégias para transformar imagens no plano comum \cite{wiki}.
+
+Dado um par de imagens estéreo, a retificação determina uma transformação de cada plano de imagem de modo que os pares de linhas epipolares conjugadas se tornem colineares e paralelas a um dos eixos da imagem. As imagens retificadas podem ser consideradas como adquiridas por uma nova sonda estéreo, obtida girando as câmeras originais ao redor do centro óptico. A importante vantagem da retificação é que as correspondências de computação, um problema de pesquisa 2-D em geral, são reduzidas a um problema de pesquisa 1-D, normalmente ao longo das linhas de varredura horizontal das imagens retificadas \cite{reti}.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% If you really need extra space, uncomment here and use extra pages after the last question.
+% Please refer here in your original answer. Thanks!
+%\pagebreak
+%\paragraph{AX.X Continued:} Your answer continued here.
+
+
+\bibliographystyle{abntex2-alf}
+\bibliography{references}
+
+\end{document}

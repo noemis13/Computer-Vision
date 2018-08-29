@@ -1,0 +1,20 @@
+\providecommand{\abntreprintinfo}[1]{%
+ \citeonline{#1}}
+\setlength{\labelsep}{0pt}\begin{thebibliography}{}
+\providecommand{\abntrefinfo}[3]{}
+\providecommand{\abntbstabout}[1]{}
+\abntbstabout{v-1.9.2 }
+
+\bibitem[SCHWARTZ e EDRINI 2003]{William}
+\abntrefinfo{SCHWARTZ e EDRINI}{SCHWARTZ; EDRINI}{2003}
+{SCHWARTZ, W.~R.; EDRINI, H.~P. Aspectos teóricos das transformadas de
+  imagens. In:  . [S.l.: s.n.], 2003. p.~1--8.}
+
+\bibitem[Sousa, Bernardino e Jr. 2010]{hibrid}
+\abntrefinfo{Sousa, Bernardino e Jr.}{SOUSA; BERNARDINO; JR.}{2010}
+{SOUSA, B.~M. de; BERNARDINO, L.~G.; JR., R. de M. \emph{Ilusões de imagens
+  híbridas}. 2010.
+  \url{http://www.blogpercepto.com/2010/11/ilusoes-de-imagens-hibridas.html}.
+Acessado em 03-04-2018.}
+
+\end{thebibliography}

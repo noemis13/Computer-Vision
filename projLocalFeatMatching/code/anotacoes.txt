@@ -1,0 +1,270 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+GET FEATURES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Depois de detectar as features, devemos combin�-la detemirnando quais recursos vem
+% de locais correspondentes em imagens diferentes. Soma das diferen�as quadradas ou
+% correlacao cruazada normalizada, pode ser usada para comparar diretamente as intesidades em
+% pequenas amostras em torno de cada ponto de recurso. Como os pontos de recurso podem n�o estar
+% localizados exatamente, a pontuacao de coresspondencia pode ser calculada executando o refinamento
+% de movimento incremental.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Bias and gain normalization (MOPS)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Compensa pequenas imprecis�es no detector de ponto de caracter�stica, essas amostras
+% orientadas para m�ltiplas escalas s�o amostradas em um espa�amento do cinco pixels em 
+% real��o a escala de deteccao, usando nivel mais grosseiro de piramide de imagem para evitar
+% o aliasing
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Scale invariant feature transform (SIFT)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% O SIFT s�o formados pelo calculo do gradiente em cada pixel em uma janela ao redor
+% do ponto chave detectado, usando um nivel apropriado da piramide gaussiana. Em cada
+% quadrante 4x4 um histograma de orienta��o de gradiente � formado. 
+% Para reduzir os efeitos da localizacao e ma orientacao da orientacao dominante 
+% cada uma das 256 magnitudes de gradiente ponderadas originais � adicionada suavemente
+% a 2 x 2 x 2 caixas de histogramas usando a interpolacao trilinear. A distribuicao
+% suave de valores � boa aplicacao onde histogramas estao sendo calculados para 
+% transformada de Hough ou equalizacao de histograma local. 128 valores n�o negativos
+% formam uma versao bruta do vetor descritor SIFT e reduz efeitos de contraste ou ganho.
+% Para tornar o descritor mais robusto para outras variacoes fotometricas, os valores
+% sao cortados para 0.2 e o vetor resultante � novamente renormalizado para o comprimento
+% da unidade.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PCA-SIFT
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Uma maneira mais simples de computar descritors inspirados no SIFT, calcula as derivadas
+% x e y em um patch 39 x 39 e reduz o vetor de 3042-dimensoes resultante para 36 usando a
+% analise de componentes principais. J� o SIFT SURF usa filtros de caixa para aproximar as
+% derivadas e integrais usadas no SIFT.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Gradient location-orientation histogram (GLOH)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Variante do SIFT e usa uma estrtura log-polar binning em vez dos quatro quadrantes usados,
+% e quem acaba tendo um melhor desempenho global
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Steerable filters
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Os filtros direcionais sao combinacoes de derivadas de filtros gaussiano que permitem
+% o calculo rapido de caracteristicas parecidas a bordas e angulos pares e impares 
+% em todas as orientacoes possiveis. Por usarem gaussianos amplos, sao um poucos insensiveis
+% aos erros de localizacao e orientacao.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Performance of local descriptors
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+% Outras tecnicas seria observando as informacoes de cores locais, multiplos estagios
+% para computacao de descritores de recursos que inclui SIFT e GLOH, DAISY para correspondencia
+% estereoscopia densa e otimizaram seus parametros com base em dados estereo verdade da terra.
+% Tambem � possivel desenvolver detectores de recursos especificos de classe ou instancia que maximizem
+% a discriminacao de outras classes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+GET_INTEREST_POINTS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% detecao de feature
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Para comparar o dois pontos em uma imagem pode se usar o somat�rio do quadrado da diferen�a
+% (Formula 4.1) I0 � a imagem 1 e I1 � a imagem 2, u=(u,u) � o vetor de dist�ncia,
+% w(x) � a funcao de ponderacao com variacao espacial
+
+% Auto-correlacao: ao realizar a deteccao de feature, nao sabemos quais feature serao comparadas
+% Entao podemos realizar variacoes na posicao de delta u
+
+% Pode se aproximar auto-correlacao usando a serie de taylor
+% O detector classico de Harris usa o filtro [-2 -1 0 1 2], mas as variacoes 
+% convolvem a imagem na derivada horizonal e verital do gaussiano (tipicamente 1)
+
+% A matrix de auto-correlacao � dada por 
+% A = w * [ix^2 ix*iy]
+%         [ix*iy iy^2]
+% w serial trocado pela somatorio das convolucoes com o peso do kernel
+
+% A matriz inversa de A produz um limite inferior sobre a incerteza na localiza��o
+% de um path correspondente. A maneira mais f�cil de visualizar e raciocinar sobre
+% essa incerteza � realizar um "eigenvalue" analisando a matriz de correlacao, a
+% qual produz dois eigenvalues e duas direcoes eigenvector
+
+% Para um valor minimo de eigenvalue usa a formula 4.9 para um alfa 0.06
+% se o pi1 for muito maior que pi0 formula 4.10, alfa = 0.05
+% se pi1 for aproximadamente pi0 4.11
+
+% Onde ponha o cheat?
+
+% Monta os filtros vertical x e horizontal y
+filtroHorizontal = [-1 -1 -1; 0 0 0; 1 1 1];
+filtroVertical = [-1 0 1; -1 0 1; -1 0 1];
+
+% Computa na horizontal e vertical as derivadas da imagem pela convolucao da imagem original
+% O parametro same retorna a parte central da convolucao com o mesmo tamanho da imagem
+Ix = conv2(image, filtroVertical, 'same');
+Iy = conv2(image, filtroHorizontal, 'same');
+
+% Ta certo isso aqui?
+% As tres imagens seriam essas, que sao os valores presente na matriz A
+Ix2 = Ix * Ix;
+Iy2 = Iy * Iy;
+Ixy = Ix * Iy;
+
+% Convolva cada uma das imagens com Gaussiano largo
+% ?????????????
+
+% Compute a uma escalar interessante
+% ?????????????
+
+% Encontre um local maximo .... passo 5
+
+%%%%%%%%%%%%%%%%%%%%
+% ANMS
+%%%%%%%%%%%%%%%%%%%%
+% Detectam as features s�o locais maximo e cujo o valor de resposta � significativamente
+% 10% maior que todos seus vizinhos dentro de um rario. Eles criam uma maneira eficiente
+% de associar a supress�o raios com todos os m�ximos locais, primeiro classificando a for�a
+% da resposta e uma lista ordenada pela diminui��o do raio de surpress�o.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Measuring repeatability
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Medicao de repetibilidade na deteccao de feature, que define a frequencia com que os pontos
+% chave detectados em uma imagem sao encontrados dentro de pixels da localizacao correspodente
+% em uma imagem de transformada, aplicando rotacao, escala, mudanca, alteracao do ponto de vista
+% e adicao de ruido. Medem o conteudo da informacao disponivel em cada ponto da feature, a melhor
+% versao � a escala do Gaussiano derivado para um valor 1 e quando o valor � dois seria a escala
+% da itnegra��o Gaussiana
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Scale invariance
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% A deteccao de feature de menor escala pode ser inapropriada, uma solucao � extrair
+% feature em uma variedade de escalas.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Rotational invariance and orientation estimation
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+% A maioria dos algoritmos de reconhecimento de imagens e reconhecimento de objetos
+% precisa lidar com a rota��o da imagem no plano. Uma maneira de lidar com esse
+% problema � projetar descritores que s�o invariantes rotacionalmente, mas esses descritores
+% mapeiam diferentes corre��es de procurar para o mesmo descritor. Um m�todo melhor � estimar uma orientacao
+% dominante em cada ponto chave.
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+% Affine invariance
+%%%%%%%%%%%%%%%%%%%%%%%%
+% Usada para correspondencia estereo de linha de base e reconhecimento de localizacao.
+% Entao atraves de uma elipse a autocorrelacao ou matriz de hessian e entao usar eixos e
+% proporcoes principais desse ajuste com o quadro de coordenadas. MSER, as regioes
+% binarias sao calculadas limitando a imagem em todos os possiveis niveis de cinza.
+% Logo os pontos chave n�o s�o os �nicos recursos que podem ser usados para registar imagens.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+MATCH FEATURES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Matching strategy and error rates
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% A estrategia mais simples � definir um limite e retornar todas as correspondencias
+% de outras imagens dentro desse limite. O limite muito alto resulta em muitos falsos positivos
+% ou seja correspondencias corretas que estao ausentes. O limite fixo � o intervalo �til
+% de limiares pode variar muito a medida que nos movemos para diferentes partes do espacao de recursos
+% a melhor estrategia � combinar com o vizinho mais proximo no espaco de recurso. Mas o ideal
+% � que ele se adapte a diferentes regioes do espaco de recursos, se tiver dados de trinamento � poss�vel
+% aprender limites diferentes para recursos diferentes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Efficient matching
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% A maneira mais simples de encontrar todos os pontos de recursos correspondentes
+% � comparar todos os recursos com todos os outros recursos em cada par de imagens 
+% potencialmente correspondentes, por�m essa pr�tica � quadr�tica. Uma melhor
+% abordagem � criar uma estrutura de indexa��o, como uma �rvore, tabela hash,
+% ou um hash multidimensional. A vers�o mais complexa seria um hashing sens�vel 
+% a localidade, que usa funcoes de hashing independemente calculando para indexar recursos.
+% Hashing sensivel a parametros , a distribuicao de pontos no espaco de parametros.
+% Outra estrutura seria as �rvores de busca multidimensionais.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Feature match verification and densification 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Podemos usar o alinhamento geometrico para verificar quais correspondencias sao inliers e 
+% quais sao outliers.
+
+https://www.cc.gatech.edu/~hays/compvision/results/proj2/html/cshih37/index.html
+https://www.cc.gatech.edu/~hays/compvision/results/proj2/html/cclaassen3/index.html
+https://www.cc.gatech.edu/~hays/compvision/results/proj2/html/cteh6/index.html
+https://www.cc.gatech.edu/~hays/compvision/results/proj2/html/bzhang356/index.html
+https://www.cc.gatech.edu/~hays/compvision/results/proj2/html/bzucker3/index.html
+https://www.cc.gatech.edu/~hays/compvision/results/proj2/html/blee329/index.html
+https://www.cc.gatech.edu/~hays/compvision/results/proj2/html/aandrews34/index.html
+https://www.cc.gatech.edu/~hays/compvision/results/proj2/html/athai6/index.html
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+SIFT - come�ar jsu38
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+https://www.cc.gatech.edu/~hays/compvision/results/proj2/html/jlee3018/index.html
+https://www.cc.gatech.edu/~hays/compvision/results/proj2/html/jkim923/index.html
+https://www.cc.gatech.edu/~hays/compvision/results/proj2/html/jsrinivasan9/index.html
+https://www.cc.gatech.edu/~hays/compvision/results/proj2/html/jchauhan8/index.html
+https://www.cc.gatech.edu/~hays/compvision/results/proj2/html/jan61/index.html
+https://www.cc.gatech.edu/~hays/compvision/results/proj2/html/ihafiz3/index.html
+https://www.cc.gatech.edu/~hays/compvision/results/proj2/html/hchen415/index.html
+https://www.cc.gatech.edu/~hays/compvision/results/proj2/html/hbai38/index.html
+https://www.cc.gatech.edu/~hays/compvision/results/proj2/html/hliu419/index.html
+https://www.cc.gatech.edu/~hays/compvision/results/proj2/html/hpan3/index.html
+https://www.cc.gatech.edu/~hays/compvision/results/proj2/html/gan9/index.html
+https://www.cc.gatech.edu/~hays/compvision/results/proj2/html/gtang9/index.html
+https://www.cc.gatech.edu/~hays/compvision/results/proj2/html/dyadav8/index.html
+https://www.cc.gatech.edu/~hays/compvision/results/proj2/html/dmondal6/index.html
+https://www.cc.gatech.edu/~hays/compvision/results/proj2/html/dburke3/index.html
+https://www.cc.gatech.edu/~hays/compvision/results/proj2/html/ddeb7/index.html
+https://www.cc.gatech.edu/~hays/compvision/results/proj2/html/delima3/index.html
+https://www.cc.gatech.edu/~hays/compvision/results/proj2/html/aroy78/index.html
+https://www.cc.gatech.edu/~hays/compvision/results/proj2/html/bzhang356/index.html
+https://www.cc.gatech.edu/~hays/compvision/results/proj2/html/adudi6/index.html*ULTIMOOOO
+https://www.cc.gatech.edu/~hays/compvision/results/proj2/html/blee329/index.html
+https://www.cc.gatech.edu/~hays/compvision/results/proj2/html/dsagar3/index.html
+https://www.cc.gatech.edu/~hays/compvision/results/proj2/html/arao82/index.html
+https://www.cc.gatech.edu/~hays/compvision/results/proj2/html/athai6/index.html
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ % SIFT http://aishack.in/tutorials/sift-scale-invariant-feature-transform-introduction/
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ % 1.Para cada feature point montamos uma matriz de 16x16
+ % 1.1 Seria da matriz feature ou do parametro x ou y?
+ % 2.Para essa matriz dividimos em submatrizes de 4x4
+ % Como calculo o gradiente e magnitude?
+ % Onde entra o histograma? Fa�o o histograma para a matriz 16x16 ou da matriz 4x4?
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ % SIFT http://aishack.in/tutorials/sift-scale-invariant-feature-transform-introduction/
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ % Ate agora o que eu fiz eu descarto (o que ta acima do
+ %do comentario)?
+ % Fingerprint para cada ponto chave (= feature points)?
+ % Esse pontos de chave, esta na matriz features, ou 
+ %no vetor x e y que vem por parametro?
+ % 1.Para cada ponto chave fazemos uma janela 16x16
+ % 2.Nessa janela de 16x16 dividimos em 16 janelas de 4x4
+ % 3.Para cada janela de 4x4, calcula a magnitude do gradiente
+ %e orientacao (como?)
+ % 4.As orientacoes sao colocadas 8 bins no histograma (como? e o que seria esses bins?)
+ % 5.A orientacao no intervalo 0-44 graus adicionando no primeiro bin2dec
+ % 6.Intervalo de 45-89 sao relacionadas ao proximo bin, e assim por diante
+ % 7.A quantia adicionam depende da magnitude do gradiente
+ % *.O valor adicionando tambem depende da distancia do ponto chave
+ % *.Os gradientes que estao distantes do ponto chave adicionarao valores
+ %menores ao histograma
+ % *.Funcao de ponderacao gaussiana, gera um gradiente. Multiplica
+ %isso com a magnitude das orientacoes e obtem algo ponderada
+ %quanto mais longe, menor a magnitude
+ % *.Faz isso para todos os 16 pixels, faz para 16 orientacoes aleatorias
+ %para 8 bins predeterminadas. Faz isso para todos os 16 quadrados dos 4x4
+ %Entao voce tem 128, e os normaliza formando um vetor de feature, o ponto 
+ %chave e exclusivamente por vetor de feature
+ % *.O ponto de chave eh entre, nao esta em um pixel. Voce precisa interpolar
+ %a imagem para gerar os dados de orientacao e magnitude entre pixels
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

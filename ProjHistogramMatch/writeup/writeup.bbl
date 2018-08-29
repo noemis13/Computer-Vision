@@ -1,0 +1,26 @@
+\providecommand{\abntreprintinfo}[1]{%
+ \citeonline{#1}}
+\setlength{\labelsep}{0pt}\begin{thebibliography}{}
+\providecommand{\abntrefinfo}[3]{}
+\providecommand{\abntbstabout}[1]{}
+\abntbstabout{v-1.9.2 }
+
+\bibitem[engcar 2018]{hist}
+\abntrefinfo{engcar}{ENGCAR}{2018}
+{ENGCAR. \emph{O Histograma de uma Imagem}. 2018.
+  \url{http://www.ufrgs.br/engcart/PDASR/hist.html}.
+Acessado em 16-05-2018.}
+
+\bibitem[Pratschke e Pelizzoni 1999]{simulated}
+\abntrefinfo{Pratschke e Pelizzoni}{PRATSCHKE; PELIZZONI}{1999}
+{PRATSCHKE, A.; PELIZZONI, J.~M. \emph{Simulated Annealing}. 1999.
+  \url{http://conteudo.icmc.usp.br/pessoas/sandra/G9_t2/annealing.htm}.
+Acessado em 16-05-2018.}
+
+\bibitem[Wikipedia 2018]{wiki}
+\abntrefinfo{Wikipedia}{WIKIPEDIA}{2018}
+{WIKIPEDIA. \emph{Histogram matching}. 2018.
+  \url{https://en.wikipedia.org/wiki/Histogram_matching}.
+Acessado em 16-05-2018.}
+
+\end{thebibliography}
